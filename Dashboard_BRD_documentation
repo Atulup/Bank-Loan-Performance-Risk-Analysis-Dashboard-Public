@@ -1,0 +1,229 @@
+# BUSINESS REQUIREMENTS DOCUMENT (BRD)
+## BANK LOAN INSIGHTS & PERFORMANCE ANALYTICS DASHBOARD
+
+---
+
+# 1. Project Purpose
+This project delivers an advanced Power BI reporting system to analyze loan applications, borrower profiles, loan performance, financial metrics, and MTD/MoM trends. The dashboards provide actionable insights for lending strategies, risk assessment, and operational efficiency.
+
+---
+
+# 2. Stakeholders
+- Loan Operations Manager  
+- Risk & Compliance Team  
+- Credit Analysts  
+- Finance & Strategy Team  
+- Branch Heads  
+- Power BI Developer  
+
+---
+
+# 3. Business Problems
+- Existing loan reporting lacks depth, interactivity, and multi-dimensional visibility.  
+- No unified view of loan performance, borrower trends, and financial metrics.  
+- Difficulty identifying good vs bad loans and understanding reasons behind defaults.  
+- Leadership cannot track MTD/MoM loan metrics for strategic decisions.  
+
+---
+
+# 4. Business Objectives
+- Build 3 interconnected dashboards showing summary KPIs, trends, and detailed loan-level insights.  
+- Enable decision-makers to analyze borrower behavior, loan quality, and state/grade distribution.  
+- Provide breakdowns by purpose, term, state, grade, home ownership, employee length, and DTI.  
+- Improve risk monitoring through good vs bad loan segmentation.  
+- Support monthly and MoM comparisons for strategic planning.  
+
+---
+
+# 5. Key KPIs
+- Total Loan Applications  
+- Total Funded Amount  
+- Total Amount Received  
+- Average Interest Rate  
+- Average DTI  
+- MTD Applications, MTD Funded Amount, MTD Received Amount  
+- MoM % changes (Sales, Funded, Received)  
+- Good Loan Percentage  
+- Bad Loan Percentage  
+- Good Loan Applications, Funded & Received Amount  
+- Bad Loan Applications, Funded & Received Amount  
+
+---
+
+# 6. Dashboard Overview
+
+## Dashboard 1: Executive Summary
+### Purpose:
+A high-level view of core KPIs showing loan performance and financial health.
+
+### Key Features:
+- Total Applications, Funded Amount, Received Amount  
+- Average Interest Rate, Average DTI  
+- Good vs Bad Loan Donut Visuals  
+- Good Loan Metrics → Apps, Funded, Received  
+- Bad Loan Metrics → Apps, Funded, Received  
+- Loan Status Grid (Fully Paid, Charged Off, Current)  
+
+---
+
+## Dashboard 2: Trends & Overview
+### Purpose:
+Detailed visual analysis of loan trends, borrower demographics, and loan characteristics.
+
+### Key Visualizations:
+- Total Loan Applications by Month (Line Chart)  
+- Applications by State (Filled Map)  
+- Loan Term Analysis (36 vs 60 months – Donut)  
+- Employee Length Analysis (Bar Chart)  
+- Loan Purpose Breakdown (Bar Chart)  
+- Home Ownership Distribution (Treemap)  
+
+---
+
+## Dashboard 3: Detailed Insights
+### Purpose:
+A table-driven detailed loan-level view for granular analysis.
+
+### Features:
+- Loan ID, Purpose, Home Ownership, Grade, Subgrade  
+- Issue Date  
+- Funded Amount, Received Amount  
+- Interest Rate, Installment  
+- State, DTI, Term  
+- Fully scrollable and filterable view for in-depth analysis  
+
+---
+
+# 7. Data Model Documentation
+
+## 7.1 Tables
+### **1. financial_loan (Fact Table)**
+Contains all loan-level data.
+
+Key Columns:  
+ID  
+Purpose  
+Home Ownership  
+Grade / Sub-Grade  
+Issue Date  
+Funded Amount  
+Amount Received  
+DTI  
+Interest Rate  
+Term  
+State  
+Application Type  
+Annual Income  
+Address State  
+Emp Length  
+Emp Title  
+Good vs Bad Loan  
+
+### **2. Date Table**
+Date  
+Month  
+Month No  
+
+Used for: MTD, MoM, Yearly & Monthly trends.
+
+### **3. table_measures**
+Holds calculated measures including:  
+avg_DTI  
+avg_interest_rate  
+bad_loan_appl  
+bad_loan_funded_amt  
+bad_loan_received_amt  
+good_loan_appl  
+good_loan_funded_amt  
+good_loan_received_amt  
+
+### **4. Select Measure**
+Used for dynamic measure selection via Power BI field parameters.
+
+---
+
+## 7.2 Relationships
+Date Table (1 — *) financial_loan  
+Key: Date = Issue Date  
+
+All other tables are standalone functional tables without relationships.
+
+---
+
+# 8. Calculated Columns (Power Query)
+- **Good vs Bad Loan** → Based on loan status  
+  (Fully Paid + Current = Good, Charged Off = Bad)  
+- Month No  
+- Month Name  
+- Standardized Grade & Subgrade  
+- Cleaned loan purpose & home ownership categories  
+- Corrected numeric types for DTI, Interest Rate, Funded, Received  
+
+---
+
+# 9. DAX Measures
+
+Total Loan Applications:
+Total_Applications = COUNT(financial_loan[ID])
+
+Total Funded Amount:
+Total_Funded = SUM(financial_loan[funded_amount])
+
+Total Received Amount:
+Total_Received = SUM(financial_loan[received_amount])
+
+Average Interest Rate:
+Avg_IR = AVERAGE(financial_loan[interest_rate])
+
+Average DTI:
+Avg_DTI = AVERAGE(financial_loan[dti])
+
+Good Loan %:
+GoodLoanPct = DIVIDE([good_loan_appl], [Total_Applications])
+
+Bad Loan %:
+BadLoanPct = DIVIDE([bad_loan_appl], [Total_Applications])
+
+MTD Applications:
+MTD_Applications = TOTALMTD([Total_Applications], 'Date Table'[Date])
+
+MoM %:
+MoM_Applications = ([ThisMonth] - [LastMonth]) / [LastMonth]
+
+---
+
+# 10. Filters & Slicers
+- State  
+- Grade  
+- Good vs Bad Loan  
+- Measure Selector  
+- Month / Date  
+- Home Ownership  
+- Loan Purpose  
+- Employee Length  
+
+---
+
+# 11. Acceptance Criteria
+- All KPIs calculate correctly including MTD & MoM  
+- Good vs Bad segmentation accurate  
+- Month-level trends must align with Issue Date  
+- Summary → Trends → Details navigation works seamlessly  
+- Visuals cross-filter properly  
+- No missing or inconsistent financial values  
+
+---
+
+# 12. Key Insights (From Dashboard)
+- 86% loans are Good, 14% are Bad  
+- Borrowers with 36-month term dominate loan volume  
+- Mortgage and Rent groups form the majority of applications  
+- Debt consolidation is the highest loan purpose category  
+- Some states show significantly higher loan activities  
+- Higher employee length borrowers tend to take larger loans  
+- Average DTI = 13.3% and Avg Interest Rate = 12%  
+- MoM loan growth is positive across all KPIs  
+
+---
+
+# END OF DOCUMENT
